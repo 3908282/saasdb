@@ -1,0 +1,35 @@
+[] getOneRow(tenantId,entityid, uuid, [fields])
+{
+	select name,entityid,entityname, value[fields[0..n]] from data where uuid=uuid;
+	
+	value[name] = name;
+	
+	foreach(field:fields)
+	{
+		if(field is number)
+			value[field] = toNumber(value[field]);
+		else if(field is date)
+			value[field] = toDate(value[field]);
+		else if(field is clob)
+		{
+			value[field] = select clob from clob where uuid = value[field];
+		}
+		else if(field is relation)
+		{
+			if(oneToX)
+			{
+				var targetUuid = (select targetUuid from relations where srcEntityId=entityId and srcUuid=uuid 
+					and relationId=value[field];
+				value[field] = targetUuid;
+			}
+			else if(masterDetail or multivalue)
+			{
+				var targetUuids[] = (select targetUuid from relations where srcEntityId=entityId and srcUuid=uuid 
+					and relationId=value[field]);
+				value[field] = targetUuids;
+			}
+		}
+	}
+	
+	return value;
+}

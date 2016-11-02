@@ -1,0 +1,54 @@
+
+insertRow(uuid, name, tenantId, entityId, Map<fieldId,value>)
+{
+	new uuid for Row if uuid is null;
+	foreach(fieldId,value)
+	{
+		get dataType, fieldNum, isIndex, isUniqueIndex
+
+		if(dataType==Clob)
+		{
+			new clobUuid for  clob row
+			insert into clob(uuid, value) values(clobUuid, value)
+			strValue = clobUuid
+		}
+		else if(dataType is relationship)
+		{
+			new relationUuid
+			strValue=relationUuid
+			if(oneToOne or manyToOne)
+			{
+				srcEntityId = entityId; srcUuid=uuid;
+				targetEntityId=value.getEntityId(); targetUuid=value.getUuid();
+				
+				insert into relationship values(tenanted, relationUUID, srcEntityId, srcUuid,targetEntityId,targetUuid);
+			}
+			if(oneToMany)  //entries,masterDetail, value is collection
+			{
+				foreach(item in value) do oneToOne
+			}
+		}
+
+		String strValue = toString(value)
+		Insert into data(uuid, name, tenantid, entityid, Value[fieldNum]) values(uuid, name, tenanted, entityid, strValue);
+	
+
+		If(isUniqueIndex or isIndex) //not clob
+		{
+			if(dataType==String)
+			{
+				strValueU = toLowercase(strValue)
+				insert into [Unique]Indexes(uuid, tenanted, entityid, fieldNum, strValue, strValueU) values()
+			}
+			else if(dataType is Number)
+			{
+				insert into [Unique]Indexes(uuid, tenanted, entityid, fieldNum,numValue) values()
+			}
+			else if(dataType is Date)
+			{
+				insert into [Unique]Indexes(uuid, tenanted, entityid, fieldNum, dateValue) values()
+			}
+		}
+	
+	}
+}

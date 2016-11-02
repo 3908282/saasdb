@@ -1,0 +1,39 @@
+
+//return uuid
+String createObject(tenantId, object)
+{
+	var entity = object.getEntity();
+	get fields;
+	
+	var uuid = newUuid();
+	
+	Map<fieldId,Object> mapValue = new HashMap();
+	foreach(field:fields)
+	{
+		if(field is relation and masterDetail) //主从关系,是集合
+		{
+			Collection collection = object[field];
+			Collection newCollection = new ArrayList();
+			
+			foreach(subobject:collection)
+			{
+				subobject.parentid = uuid;
+				var subobjectUuid = create(subobject);
+				newCollection.add(subobjectUuid);
+			}
+			mapValue.put(fieldId, newCollection);
+		}
+		else if(field is relation)
+		{
+			var refObject = object[field];
+			var refObjectUuid = create(refObject);
+			mapValue.put(fieldId, refObjectUuid);
+		}
+		else
+			mapValue.put(fieldId, object[field]);
+	}
+	
+
+	insertRow(uuid, object.getName(), tenantId, entity.getId(), mapValue);
+	return uuid;
+}

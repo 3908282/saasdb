@@ -1,0 +1,4 @@
+softDeleteRow(uuid)
+{
+	update data set isdeleted=true and deletedTime=currentTime() where uuid=uuid;
+}

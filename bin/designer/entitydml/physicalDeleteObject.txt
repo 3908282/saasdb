@@ -1,0 +1,18 @@
+physicalDeleteObject(object)
+{
+	var entity = object.getEntity();
+	get fields;
+	
+	foreach(field:fields)
+	{
+		if(field is relation and masterDetail) //主从关系,是集合
+		{
+			Collection entries = object[field];
+			for(subobject:entries)
+				physicalDeleteObject(subobject);
+
+		}
+	}
+	
+	physicalDeleteRow(object.uuid);
+}

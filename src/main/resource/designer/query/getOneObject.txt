@@ -1,0 +1,39 @@
+field may be field.company
+
+Object getOneObject(tenantId,entityid, uuid, [fields])
+{
+	Object values[] = getOneRow(uuid, filter(fields,null)); //fields should be filter by this level
+	
+	foreach(field:fields)
+	{
+		if(field is relation)
+		{
+			if(oneToX)
+			{
+				String subuuid = values[field];
+				String[] subFields = filter(fields, field); //filter sub fields by field
+				values[field] = getOneObject(subuuid, subFields);
+			}
+			else if(masterDetail or multivalue)
+			{
+				String[] subuuids = values[field];
+				String[] subFields = filter(fields, field); //filter sub fields by field
+				//Object[] subObjects = new Object[subuuids.length];
+				values[field] = getManyObject(subuuids, subFields);
+			}
+		}
+	}
+	
+	Object result = createObject(entityId, values);
+	
+	return result;
+}
+
+//if fields[n] is field.a, return a, or field.a.b return a.b
+String[] filter(String[] fields, String field)
+{
+	return map(fields, function()-->
+		if (fields[n] beginWith field)
+			return fields[n].trimWith(field);  
+		);
+}

@@ -1,0 +1,48 @@
+
+//todo: how to do if predicate is clob? full text seach index?
+
+predicate:[field, operator, value]
+
+Object[] queryByField(tenantid, entityid, predicate, fields[])
+{
+
+	int fieldNum = checkFieldNum(predicate.field);
+	if(predicate.field is [unique]index && shouldIndex(tenantid, entityid, predicate))
+	{
+		
+		//Object value = toNumber(value) or toDate(value) or toString(value);
+		
+		String[] uuids = (select uuid from [unique]indexes where fieldNum=fieldNum and 
+			(strValue operator toString(value)) if field is String
+			or
+			(numValue operator toNumber(value)) if field is Number
+			or
+			(dateValue operator toDate(value)) if field is Date
+			
+		);
+		
+		return getManyObject(tenants, entityid, uuids, fields);
+			
+	}
+	else
+	{
+		{
+		Object[] values = (select uuid,name,field[] from data where 
+			(values[fieldNum] operator toString(value))
+			);
+		return convertToObjects(values)
+		}
+		or
+		{
+		String[] uuids = (select uuid  from data where 
+			(values[fieldNum] operator toString(value))
+			);
+		return getManyObject(tenants, entityid, uuids, fields);
+		}
+	}
+}
+
+boolean shouldIndex(tenantid, entityid, predicate)
+{
+	check by cost model;
+}

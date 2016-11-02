@@ -1,0 +1,71 @@
+//make sure Map<fieldId,value> are all modified
+updateRow(uuid, tenantId, entityId, Map<fieldId,value>)
+{
+	foreach(fieldId,value)
+	{
+		get dataType, fieldNum, isIndex, isUniqueIndex
+
+		if(dataType==Clob)
+		{
+			get oldClobUuid;// select value[fieldNum] from data where uuid=uuid
+			delete clob where uuid = oldClobUuid;
+			
+			new clobUuid for  clob row
+			insert into clob(uuid, value) values(clobUuid, value)
+			strValue = clobUuid
+		}
+		else if(dataType is relationship)
+		{
+			get oldRelationId; // select value[fieldNum] from data where uuid=uuid
+			
+			
+			relationUuid = oldRelationId;
+			strValue=relationUuid
+			if(oneToOne or manyToOne)
+			{
+			
+				srcEntityId = entityId; srcUuid=uuid;
+				targetEntityId=value.getEntityId(); targetUuid=value.getUuid();
+				
+				{
+				delete relationship where uuid = oldRelationId;
+				insert into relationship values(tenanted, relationUUID, srcEntityId, srcUuid,targetEntityId,targetUuid);
+				}
+				or
+				{
+				update relationship values(tenanted, relationUUID, srcEntityId, srcUuid,targetEntityId,targetUuid) where relationUuid=relationUuid;
+				}
+			}
+			if(oneToMany)  //entries,masterDetail, value is collection
+			{
+				get delta collection;
+				delete toDeleteCollection;
+				insert newCollection;
+				
+				//foreach(item in value) do oneToOne
+			}
+		}
+
+		String strValue = toString(value)
+		update data( tenantid, entityid, Value[fieldNum]) values(tenanted, entityid, strValue) where uuid=uuid;
+	
+
+		If(isUniqueIndex or isIndex) //not clob
+		{
+			if(dataType==String)
+			{
+				strValueU = toLowercase(strValue)
+				update [Unique]Indexes(tenanted, entityid, fieldNum, strValue, strValueU) values() where uuid=uuid
+			}
+			else if(dataType is Number)
+			{
+				update [Unique]Indexes(uuid, tenanted, entityid, fieldNum,numValue) values() where uuid=uuid
+			}
+			else if(dataType is Date)
+			{
+				update [Unique]Indexes(tenanted, entityid, fieldNum, dateValue) values() where uuid=uuid
+			}
+		}
+	
+	}
+}

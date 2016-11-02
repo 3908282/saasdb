@@ -1,0 +1,25 @@
+physicalDeleteRow(entityid,uuid)
+{
+	boolean hasIndexes, hasUniqueIndexes;
+	
+	foreach(field:fields in entityid)
+	{
+		if(field is clob)
+			get clobUuid and delete clob where uuid=clobUuid;
+		else if(field is relation)
+			get relationUuid and delete relations where uuid=relationUuid;
+		if(field is uniqueIndex)
+			hasUniqueIndexes = true;
+		else if(field is index)
+			hasIndexes = true;
+	}
+	if(hasIndexes)
+		delete indexes where uuid=uuid;
+	if(hasUniqueIndexes)
+		delete uniqueIndexes where uuid=uuid;
+	
+	
+	delete data where uuid=uuid;
+	
+	
+}
